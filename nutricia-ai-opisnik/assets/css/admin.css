@@ -1,0 +1,125 @@
+/* Nutricia AI Opisnik - admin styles */
+
+.nutricia-ai-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 20px;
+	align-items: flex-start;
+	margin-top: 16px;
+}
+
+.nutricia-ai-main {
+	flex: 1 1 620px;
+	min-width: 0;
+}
+
+.nutricia-ai-side {
+	flex: 0 1 340px;
+}
+
+.nutricia-ai-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	padding: 16px 20px;
+	margin-bottom: 20px;
+	box-shadow: 0 1px 1px rgba( 0, 0, 0, 0.04 );
+}
+
+.nutricia-ai-card h2 {
+	margin-top: 0;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.nutricia-ai-stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin: 12px 0;
+}
+
+.nutricia-ai-stat {
+	flex: 1 1 120px;
+	background: #f6f7f7;
+	border: 1px solid #e2e4e7;
+	border-radius: 6px;
+	padding: 14px 10px;
+	text-align: center;
+}
+
+.nutricia-ai-stat .num {
+	display: block;
+	font-size: 28px;
+	font-weight: 700;
+	line-height: 1.1;
+}
+
+.nutricia-ai-stat .lbl {
+	display: block;
+	font-size: 12px;
+	color: #646970;
+	margin-top: 4px;
+}
+
+.nutricia-ai-stat.is-done .num { color: #1a7f37; }
+.nutricia-ai-stat.is-pending .num { color: #0969da; }
+.nutricia-ai-stat.is-error .num { color: #cf222e; }
+
+.nutricia-ai-nextrun {
+	margin: 8px 0 14px;
+	color: #50575e;
+}
+
+.nutricia-ai-actions .button {
+	margin-right: 8px;
+}
+
+.nutricia-ai-badge {
+	display: inline-block;
+	padding: 1px 8px;
+	border-radius: 10px;
+	font-size: 11px;
+	font-weight: 600;
+	vertical-align: middle;
+}
+
+.nutricia-ai-badge.ok { background: #edfaef; color: #1a7f37; }
+.nutricia-ai-badge.warn { background: #fcf0e6; color: #bb5a00; }
+
+.nutricia-ai-log {
+	margin: 0;
+	max-height: 520px;
+	overflow-y: auto;
+	font-size: 12px;
+}
+
+.nutricia-ai-log li {
+	padding: 8px 10px;
+	border-bottom: 1px solid #f0f0f1;
+	border-left: 3px solid #dcdcde;
+}
+
+.nutricia-ai-log li.level-success { border-left-color: #1a7f37; }
+.nutricia-ai-log li.level-error { border-left-color: #cf222e; }
+.nutricia-ai-log li.level-warning { border-left-color: #bb5a00; }
+.nutricia-ai-log li.level-info { border-left-color: #0969da; }
+
+.nutricia-ai-log .time {
+	display: block;
+	color: #8c8f94;
+	font-size: 11px;
+}
+
+.nutricia-ai-log .msg {
+	display: block;
+	margin-top: 2px;
+}
+
+.nutricia-ai-err {
+	color: #cf222e;
+}
+
+.column-nutricia_ai {
+	width: 12%;
+}
