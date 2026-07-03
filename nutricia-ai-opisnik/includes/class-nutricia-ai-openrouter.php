@@ -91,7 +91,21 @@ class Nutricia_AI_OpenRouter {
 		}
 
 		$content = $data['choices'][0]['message']['content'];
-		$parsed  = self::parse_json_content( $content );
+
+		// Some providers return content as an array of parts; join the text bits.
+		if ( is_array( $content ) ) {
+			$text = '';
+			foreach ( $content as $part ) {
+				if ( is_array( $part ) && isset( $part['text'] ) ) {
+					$text .= $part['text'];
+				} elseif ( is_string( $part ) ) {
+					$text .= $part;
+				}
+			}
+			$content = $text;
+		}
+
+		$parsed = self::parse_json_content( $content );
 
 		if ( null === $parsed ) {
 			return new WP_Error(

@@ -134,7 +134,8 @@ class Nutricia_AI_Cron {
 			return (int) $query->posts[0];
 		}
 
-		// Second: retry errored products under the attempt limit.
+		// Second: retry errored products (and any stale "processing" left over
+		// from a crashed run) that are still under the attempt limit.
 		$retry = new WP_Query(
 			array(
 				'post_type'      => 'product',
@@ -148,8 +149,8 @@ class Nutricia_AI_Cron {
 					'relation' => 'AND',
 					array(
 						'key'     => Nutricia_AI_Settings::META_STATUS,
-						'value'   => 'error',
-						'compare' => '=',
+						'value'   => array( 'error', 'processing' ),
+						'compare' => 'IN',
 					),
 					array(
 						'key'     => Nutricia_AI_Settings::META_ATTEMPTS,
@@ -174,7 +175,17 @@ class Nutricia_AI_Cron {
 	 * @return array
 	 */
 	public static function get_stats() {
-		$total = (int) wp_count_posts( 'product' )->publish;
+		if ( ! post_type_exists( 'product' ) ) {
+			return array(
+				'total'   => 0,
+				'done'    => 0,
+				'error'   => 0,
+				'pending' => 0,
+			);
+		}
+
+		$counts = wp_count_posts( 'product' );
+		$total  = isset( $counts->publish ) ? (int) $counts->publish : 0;
 
 		$done = self::count_by_status( 'done' );
 		$error = self::count_by_status( 'error' );

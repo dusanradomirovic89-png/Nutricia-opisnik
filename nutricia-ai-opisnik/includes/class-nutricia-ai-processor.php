@@ -26,11 +26,20 @@ class Nutricia_AI_Processor {
 			return new WP_Error( 'nutricia_not_configured', __( 'Plugin nije podešen (nedostaje API ključ ili model).', 'nutricia-ai-opisnik' ) );
 		}
 
+		if ( ! function_exists( 'wc_get_product' ) ) {
+			return new WP_Error( 'nutricia_no_wc', __( 'WooCommerce nije aktivan.', 'nutricia-ai-opisnik' ) );
+		}
+
 		$product = wc_get_product( $product_id );
 		if ( ! $product ) {
 			return new WP_Error( 'nutricia_no_product', __( 'Proizvod nije pronađen.', 'nutricia-ai-opisnik' ) );
 		}
 
+		// Increment attempts up front so a hard crash mid-processing (e.g. a
+		// timeout) is still counted and cannot become a poison pill that
+		// permanently blocks the queue.
+		$attempts = (int) get_post_meta( $product_id, Nutricia_AI_Settings::META_ATTEMPTS, true ) + 1;
+		update_post_meta( $product_id, Nutricia_AI_Settings::META_ATTEMPTS, $attempts );
 		update_post_meta( $product_id, Nutricia_AI_Settings::META_STATUS, 'processing' );
 
 		$data = self::collect_product_data( $product );
@@ -53,6 +62,7 @@ class Nutricia_AI_Processor {
 
 		update_post_meta( $product_id, Nutricia_AI_Settings::META_STATUS, 'done' );
 		update_post_meta( $product_id, Nutricia_AI_Settings::META_PROCESSED, current_time( 'mysql' ) );
+		update_post_meta( $product_id, Nutricia_AI_Settings::META_ATTEMPTS, 0 );
 		delete_post_meta( $product_id, Nutricia_AI_Settings::META_ERROR );
 
 		Nutricia_AI_Logger::success(
@@ -68,15 +78,13 @@ class Nutricia_AI_Processor {
 	}
 
 	/**
-	 * Record an error against a product and bump attempt counter.
+	 * Record an error against a product. The attempt counter is bumped at the
+	 * start of process(), so it is not incremented again here.
 	 *
 	 * @param int    $product_id Product ID.
 	 * @param string $message    Error message.
 	 */
 	protected static function mark_error( $product_id, $message ) {
-		$attempts = (int) get_post_meta( $product_id, Nutricia_AI_Settings::META_ATTEMPTS, true );
-		$attempts++;
-		update_post_meta( $product_id, Nutricia_AI_Settings::META_ATTEMPTS, $attempts );
 		update_post_meta( $product_id, Nutricia_AI_Settings::META_STATUS, 'error' );
 		update_post_meta( $product_id, Nutricia_AI_Settings::META_ERROR, wp_strip_all_tags( $message ) );
 
